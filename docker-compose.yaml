@@ -1,0 +1,46 @@
+version: '3'
+
+services:
+  prisma-vitest:
+    build: .
+    container_name: prisma-vitest
+    depends_on:
+      - prisma-postgres
+    networks:
+      - prisma-vitest-net
+      - prisma-postgres-net-db
+    volumes:
+      - .:/home/node/app/node_modules
+      - .:/app
+
+  prisma-postgres:
+    image: postgres:14.1
+    container_name: prisma-postgres-container-db
+    restart: always
+    env_file:
+      - ./config.env
+    logging:
+      options:
+        max-size: 10m
+        max-file: '3'
+    networks:
+      - prisma-vitest-net
+      - prisma-postgres-net-db
+    ports:
+      - 5433:5432
+    volumes:
+      - prisma-postgres-vol-db:/var/lib/postgresql/data
+
+networks:
+  prisma-postgres-net-db:
+    name: prisma-postgres-net-db
+
+  prisma-vitest-net:
+    name: prisma-vitest-net
+
+volumes:
+  prisma-vitest:
+    name: prisma-vitest
+
+  prisma-postgres-vol-db:
+    name: prisma-postgres-vol-db
